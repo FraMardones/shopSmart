@@ -35,4 +35,17 @@ public class productoController {
         inventario.add(nuevoProducto);
         return new ResponseEntity<>(nuevoProducto, HttpStatus.CREATED);
     }
+
+    // Endpoint 3: GET /productos/{id}
+    @GetMapping("/{id}")
+    public ResponseEntity<?> obtenerProductoPorId(@PathVariable Long id) {
+        for (producto p : inventario) {
+            if (p.getId().equals(id)) {
+                return new ResponseEntity<>(p, HttpStatus.OK);
+            }
+        }
+        
+        // Si no lo encuentra, devuelve un mensaje personalizado y un estado 404
+        return new ResponseEntity<>("Producto con ID " + id + " no encontrado.", HttpStatus.NOT_FOUND);
+    }
 }

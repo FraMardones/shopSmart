@@ -17,14 +17,20 @@ RUN mvn clean package -DskipTests
 FROM eclipse-temurin:21-jre-alpine
 WORKDIR /app
 
+# Crear un usuario y grupo sin privilegios de administrador por seguridad
+RUN addgroup -S shopgroup && adduser -S shopuser -G shopgroup
 
 # Copiar solo el archivo JAR compilado desde la etapa anterior
-COPY --from=build /app/target/ShopSmart-0.0.1-SNAPSHOT.jar app.jar
+COPY --from=build /app/target/*.jar app.jar
 
+# Cambiar la propiedad del archivo al nuevo usuario
+RUN chown shopuser:shopgroup app.jar
+
+# Usar el usuario sin privilegios
+USER shopuser:shopgroup
 
 # Exponer el puerto
 EXPOSE 8080
-
 
 # Comando de inicio del microservicio
 ENTRYPOINT ["java", "-jar", "app.jar"]
